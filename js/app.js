@@ -296,6 +296,30 @@ function removeBook(id) {
 /**
  * @param {Event} event
  * */
+function handleReadChange(event) {
+  if (!(event.target && event.target instanceof HTMLElement)) return;
+  const card = event.target.closest(".card");
+  if (!(card && card instanceof HTMLElement)) return;
+  const bookId = card.dataset.id;
+  if (bookId === undefined) return;
+  toggleRead(bookId);
+  renderCards();
+}
+
+/**
+ * @param {string} bookId
+ * */
+function toggleRead(bookId) {
+  for (const book of books) {
+    if (book.id === bookId) {
+      book.read = !book.read;
+    }
+  }
+}
+
+/**
+ * @param {Event} event
+ * */
 function handleMainEvent(event) {
   if (!(event.target && event.target instanceof HTMLElement)) return;
 
@@ -308,6 +332,8 @@ function handleMainEvent(event) {
     renderCards();
   } else if (event.target.matches("#new-book")) {
     newBookHandler();
+  } else if (event.target.matches(".toggle-read")) {
+    handleReadChange(event);
   }
 }
 
@@ -329,23 +355,22 @@ function renderCards() {
 
   books.forEach(({ title, description, author, pages, read, id: cardId }) => {
     const card = createElement("div", "card");
-    const cardFooter = createElement("div", "card-footer");
-
-    cardFooter.append(
-      createElement("p", "author", author),
-      createElement("p", "pages", `${pages} pages`),
-      createElement("p", "read", read ? "read" : "non read"),
-    );
 
     card.append(
       createElement("h3", "title", title),
       createElement("p", "description", description),
-      cardFooter,
+      createElement("p", "author", author),
+      createElement("p", "pages", `${pages} pages`),
       (() => {
-        const trash = document.createElement("img");
-        trash.className = "trash";
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "toggle-read";
+        button.textContent = read ? "Mark as unread" : "Mark as read";
+        return button;
+      })(),
+      (() => {
+        const trash = createElement("img", "trash");
         trash.setAttribute("src", "./static/trash.svg");
-
         return trash;
       })(),
     );

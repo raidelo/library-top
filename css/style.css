@@ -39,6 +39,8 @@ body {
   box-sizing: border-box;
 }
 
+/* Header */
+
 header {
   background-color: var(--beige);
   padding: 10px 20px;
@@ -53,6 +55,8 @@ header {
   font-weight: bold;
   box-shadow: 2px 2px 6px -2px var(--beige-shadow);
 }
+
+/* main */
 
 #info {
   font-size: 16px;
@@ -75,22 +79,44 @@ header {
   padding: 10px;
 
   display: grid;
-  grid-template-rows: min-content minmax(1fr, 50px) min-content min-content;
+  grid-template: min-content minmax(1fr, 50px) repeat(2, min-content) / 3fr 1fr;
+  grid-template-areas: "title title" "description description" "author pages" "read trash";
   gap: 6px;
+
+  align-items: center;
 
   .title {
     font-size: 1.05em;
+    grid-area: title;
   }
 
   .description {
     font-size: 0.85em;
+    grid-area: description;
+    margin-bottom: 10px;
   }
 
-  .card-footer {
+  .author {
+    grid-area: author;
+  }
+
+  .pages {
+    grid-area: pages;
+    justify-self: end;
+  }
+
+  .toggle-read {
+    padding: 8px;
+    border-radius: 0.7em;
+    border: none;
+    background-color: var(--light-bronze);
+    font-weight: bold;
+  }
+
+  .author,
+  .pages,
+  .toggle-read {
     font-size: 0.8em;
-    display: grid;
-    gap: 10px;
-    grid-template-columns: 4fr 1fr 1fr;
   }
 
   .trash {
@@ -101,6 +127,7 @@ header {
     padding: 6px;
     border-radius: 1rem;
     overflow: visible;
+    grid-area: trash;
   }
 }
 
@@ -114,8 +141,6 @@ header {
     transform: scale(1.02);
   }
 }
-
-/* Main */
 
 .creating-book {
   display: grid;
