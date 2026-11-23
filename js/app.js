@@ -151,7 +151,7 @@ function getForm() {
   let form = document.createElement("form");
   form.id = "create-book-form";
 
-  let _formTitle = createFormRow("title", "text", "Title:");
+  let _formTitle = createFormRow("title", "text", "Title:", true);
   let _formDescription = document.createElement("div");
   _formDescription.setAttribute("id", "form-description");
   _formDescription.append(
@@ -163,22 +163,23 @@ function getForm() {
     })(),
     (() => {
       const _textArea = document.createElement("textarea");
+      _textArea.required = true;
       _textArea.setAttribute("id", "description");
       _textArea.setAttribute("name", "description");
       return _textArea;
     })(),
   );
 
-  let _formAuthor = createFormRow("author", "text", "Author:");
-  let _formPages = createFormRow("pages", "number", "Pages:");
-  let _formRead = createFormRow("read", "checkbox", "Read:");
+  let _formAuthor = createFormRow("author", "text", "Author:", true);
+  let _formPages = createFormRow("pages", "number", "Pages:", true);
+  let _formRead = createFormRow("read", "checkbox", "Read:", false);
 
   let _formCreate = document.createElement("button");
   _formCreate.id = "create-book";
-  _formCreate.type = "button";
+  _formCreate.type = "submit";
   _formCreate.textContent = "Create";
 
-  _formCreate.addEventListener("click", createBookHandler);
+  form.addEventListener("submit", createBookHandler);
 
   form.append(
     _formTitle,
@@ -196,9 +197,10 @@ function getForm() {
  * @param {string} inputName
  * @param {string} inputType
  * @param {string} labelText
+ * @param {boolean} required
  * @returns {HTMLDivElement}
  */
-function createFormRow(inputName, inputType, labelText) {
+function createFormRow(inputName, inputType, labelText, required) {
   let div = document.createElement("div");
   div.classList.add("form-row");
 
@@ -209,6 +211,9 @@ function createFormRow(inputName, inputType, labelText) {
   input.setAttribute("id", inputName);
   input.setAttribute("name", inputName);
   input.setAttribute("type", inputType ?? "text");
+  if (required) {
+    input.required = true;
+  }
 
   div.append(label, input);
 
@@ -277,8 +282,10 @@ function newBookHandler(main) {
 
 /**
  * @param {Event} event
- */
+ * */
 function createBookHandler(event) {
+  event.preventDefault();
+
   /**
    * @param {string} selector
    * @returns {HTMLInputElement}
@@ -297,7 +304,7 @@ function createBookHandler(event) {
 
   let { title, author, pages, read } = Object.fromEntries(
     keys.map((key) => {
-      return [key, $button(`#${key}`).value];
+      return [key, $button(`#${key}`)];
     }),
   );
 
@@ -306,7 +313,13 @@ function createBookHandler(event) {
     throw "El elemento definido por el selector #description no es un textarea.";
   }
 
-  let book = new Book(author, title, description.value, pages, read);
+  let book = new Book(
+    author.value,
+    title.value,
+    description.value,
+    pages.valueAsNumber,
+    read.checked,
+  );
 
   addBookToLibrary(book);
 
@@ -341,7 +354,7 @@ function main() {
   renderCards();
 
   const button = $("#new-book");
-  button.addEventListener("click", (event) => newBookHandler(main));
+  button.addEventListener("click", () => newBookHandler(main));
 
   document.addEventListener("click", handleMainEvent);
 }
