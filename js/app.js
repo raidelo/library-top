@@ -95,7 +95,7 @@ const testBooks = [
   },
 ];
 /** @type {BookData[]} */
-let books = testBooks;
+const books = testBooks;
 
 /**
  * @constructor
@@ -220,54 +220,9 @@ function createFormRow(inputName, inputType, labelText, required) {
   return div;
 }
 
-function renderCards() {
-  let cards = document.createElement("div");
-  cards.setAttribute("id", "cards");
-
-  books.forEach(({ title, description, author, pages, read, id: cardId }) => {
-    const card = createElement("div", "card");
-    const cardFooter = createElement("div", "card-footer");
-
-    cardFooter.append(
-      createElement("p", "author", author),
-      createElement("p", "pages", `${pages} pages`),
-      createElement("p", "read", read ? "read" : "non read"),
-    );
-
-    card.append(
-      createElement("h3", "title", title),
-      createElement("p", "description", description),
-      cardFooter,
-      (() => {
-        const trash = document.createElement("img");
-        trash.className = "trash";
-        trash.setAttribute("src", "./static/trash.svg");
-
-        return trash;
-      })(),
-    );
-
-    card.dataset.id = cardId;
-
-    cards.appendChild(card);
-  });
-
+function newBookHandler() {
   let main = $("main");
 
-  let oldCards = document.querySelector("#cards");
-
-  if (oldCards === null) {
-    main.append(cards);
-    return;
-  }
-
-  main.replaceChild(cards, oldCards);
-}
-
-/**
- * @param {Element} main
- */
-function newBookHandler(main) {
   const form = main.querySelector("#create-book-form");
 
   if (!form) {
@@ -338,42 +293,84 @@ function removeBook(id) {
   }
 }
 
-function main() {
-  let main = $("main");
-
-  if (books.length == 0) {
-    const text = document.createElement("p");
-    text.setAttribute("id", "info");
-    text.textContent = "There are no books to show.";
-
-    main.appendChild(text);
-
-    return;
-  }
-
-  renderCards();
-
-  const button = $("#new-book");
-  button.addEventListener("click", () => newBookHandler(main));
-
-  document.addEventListener("click", handleMainEvent);
-}
-
 /**
  * @param {Event} event
  * */
 function handleMainEvent(event) {
-  if (!event.target) return;
-  if (event.target instanceof HTMLElement) {
-    if (event.target.matches(".trash")) {
-      const card = event.target.closest(".card");
-      if (!card || !(card instanceof HTMLElement)) return;
-      const id = card.dataset.id;
-      if (id === undefined) return;
-      removeBook(id);
-      renderCards();
-    }
+  if (!(event.target && event.target instanceof HTMLElement)) return;
+
+  if (event.target.matches(".trash")) {
+    const card = event.target.closest(".card");
+    if (!(card && card instanceof HTMLElement)) return;
+    const id = card.dataset.id;
+    if (id === undefined) return;
+    removeBook(id);
+    renderCards();
+  } else if (event.target.matches("#new-book")) {
+    newBookHandler();
   }
+}
+
+function renderCards() {
+  let cards = $("#cards");
+
+  if (books.length === 0) {
+    const text = document.createElement("p");
+    text.id = "info";
+    text.textContent = "There are no books to show.";
+
+    cards.classList.remove("with-content");
+    cards.replaceChildren(text);
+    return;
+  }
+
+  const newCards = document.createElement("div");
+  newCards.id = "cards";
+
+  books.forEach(({ title, description, author, pages, read, id: cardId }) => {
+    const card = createElement("div", "card");
+    const cardFooter = createElement("div", "card-footer");
+
+    cardFooter.append(
+      createElement("p", "author", author),
+      createElement("p", "pages", `${pages} pages`),
+      createElement("p", "read", read ? "read" : "non read"),
+    );
+
+    card.append(
+      createElement("h3", "title", title),
+      createElement("p", "description", description),
+      cardFooter,
+      (() => {
+        const trash = document.createElement("img");
+        trash.className = "trash";
+        trash.setAttribute("src", "./static/trash.svg");
+
+        return trash;
+      })(),
+    );
+
+    card.dataset.id = cardId;
+
+    newCards.appendChild(card);
+  });
+
+  newCards.classList.add("with-content");
+
+  $("main").replaceChild(newCards, cards);
+}
+
+function main() {
+  const main = $("main");
+
+  let cards = document.createElement("div");
+  cards.id = "cards";
+
+  main.appendChild(cards);
+
+  renderCards();
+
+  document.addEventListener("click", handleMainEvent);
 }
 
 main();
