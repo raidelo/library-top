@@ -97,21 +97,22 @@ const testBooks = [
 /** @type {BookData[]} */
 const books = testBooks;
 
-/**
- * @constructor
- * @param {string} author
- * @param {string} title
- * @param {string} description
- * @param {number} pages
- * @param {boolean} read
- * */
-function Book(author, title, description, pages, read) {
-  this.author = author;
-  this.title = title;
-  this.description = description;
-  this.pages = pages;
-  this.read = read;
-  this.id = crypto.randomUUID();
+class Book {
+  /**
+   * @param {string} author
+   * @param {string} title
+   * @param {string} description
+   * @param {number} pages
+   * @param {boolean} read
+   * */
+  constructor(author, title, description, pages, read) {
+    this.author = author;
+    this.title = title;
+    this.description = description;
+    this.pages = pages;
+    this.read = read;
+    this.id = crypto.randomUUID();
+  }
 }
 
 /** @param {BookData} book */
